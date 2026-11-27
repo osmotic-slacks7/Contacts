@@ -19,6 +19,7 @@ import org.fossify.contacts.databinding.ActivityInsertEditContactBinding
 import org.fossify.contacts.dialogs.ChangeSortingDialog
 import org.fossify.contacts.dialogs.FilterContactSourcesDialog
 import org.fossify.contacts.extensions.config
+import org.fossify.contacts.extensions.updateNavigationTabColors
 import org.fossify.contacts.fragments.MyViewPagerFragment
 import org.fossify.contacts.helpers.ADD_NEW_CONTACT_NUMBER
 import org.fossify.contacts.helpers.KEY_EMAIL
@@ -184,12 +185,12 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
 
         binding.insertEditTabsHolder.onTabSelectionChanged(
             tabUnselectedAction = {
-                updateBottomTabItemColors(it.customView, false, getDeselectedTabDrawableIds()[it.position])
+                updateNavigationTabColors(it.customView, false, getDeselectedTabDrawableIds()[it.position])
             },
             tabSelectedAction = {
                 binding.insertEditMenu.closeSearch()
                 binding.viewPager.currentItem = it.position
-                updateBottomTabItemColors(it.customView, true, getSelectedTabDrawableIds()[it.position])
+                updateNavigationTabColors(it.customView, true, getSelectedTabDrawableIds()[it.position])
             }
         )
 
@@ -213,11 +214,11 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
 
     private fun setupTabColors() {
         val activeView = binding.insertEditTabsHolder.getTabAt(binding.viewPager.currentItem)?.customView
-        updateBottomTabItemColors(activeView, true, getSelectedTabDrawableIds()[binding.viewPager.currentItem])
+        updateNavigationTabColors(activeView, true, getSelectedTabDrawableIds()[binding.viewPager.currentItem])
 
         getInactiveTabIndexes(binding.viewPager.currentItem).forEach { index ->
             val inactiveView = binding.insertEditTabsHolder.getTabAt(index)?.customView
-            updateBottomTabItemColors(inactiveView, false, getDeselectedTabDrawableIds()[index])
+            updateNavigationTabColors(inactiveView, false, getDeselectedTabDrawableIds()[index])
         }
 
         val bottomBarColor = getBottomNavigationBackgroundColor()

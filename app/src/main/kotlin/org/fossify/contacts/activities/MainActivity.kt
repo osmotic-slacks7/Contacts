@@ -8,6 +8,10 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Icon
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
+import android.graphics.Typeface
+import android.util.TypedValue
+import android.view.View
+import android.widget.EditText
 import androidx.viewpager.widget.ViewPager
 import me.grantland.widget.AutofitHelper
 import org.fossify.commons.databases.ContactsDatabase
@@ -29,6 +33,10 @@ import org.fossify.contacts.dialogs.FilterContactSourcesDialog
 import org.fossify.contacts.extensions.config
 import org.fossify.contacts.extensions.handleGenericContactClick
 import org.fossify.contacts.extensions.tryImportContactsFromFile
+import org.fossify.contacts.extensions.updateNavigationTabColors
+import org.fossify.contacts.extensions.ToneRole
+import org.fossify.contacts.extensions.getToneColor
+import org.fossify.contacts.fragments.ContactsFragment
 import org.fossify.contacts.fragments.FavoritesFragment
 import org.fossify.contacts.fragments.MyViewPagerFragment
 import org.fossify.contacts.helpers.ALL_TABS_MASK
@@ -185,7 +193,12 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
         binding.mainMenu.toggleHideOnScroll(false)
         binding.mainMenu.setupMenu()
 
+        binding.mainMenu.onSearchOpenListener = {
+            applyHeaderMode(isSearching = true)
+        }
+
         binding.mainMenu.onSearchClosedListener = {
+            applyHeaderMode(isSearching = false)
             getAllFragments().forEach {
                 it?.onSearchClosed()
             }
@@ -197,6 +210,11 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
 
         binding.mainMenu.requireToolbar().setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.create_contact_menu -> findViewById<ContactsFragment>(R.id.contacts_fragment)?.fabClicked()
+                R.id.search_menu -> {
+                    binding.mainMenu.focusView()
+                    showKeyboard(binding.mainMenu.findViewById(org.fossify.commons.R.id.top_toolbar_search))
+                }
                 R.id.sort -> showSortingDialog(showCustomSorting = getCurrentFragment() is FavoritesFragment)
                 R.id.filter -> showFilterDialog()
                 R.id.dialpad -> launchDialpad()
@@ -236,6 +254,36 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
 
     private fun updateMenuColors() {
         binding.mainMenu.updateColors()
+        // Samsung One UI style: light grey page behind the white cards, top bar included
+        val pageColor = getToneColor(ToneRole.PAGE)
+        binding.mainMenu.setBackgroundColor(pageColor)
+        binding.mainCoordinator.setBackgroundColor(pageColor)
+        binding.mainHolder.setBackgroundColor(pageColor)
+        binding.mainMenu.findViewById<View>(org.fossify.commons.R.id.toolbar_container)
+            ?.background?.applyColorFilter(getToneColor(ToneRole.CARD))
+        applyHeaderMode(binding.mainMenu.isSearchOpen)
+    }
+
+    /**
+     * Samsung One UI style header: a big bold "Contacts" title with + / search / overflow icons.
+     * While searching it turns into a rounded search field with a back arrow.
+     */
+    private fun applyHeaderMode(isSearching: Boolean) {
+        val textColor = getProperTextColor()
+        val searchField = binding.mainMenu.findViewById<EditText>(org.fossify.commons.R.id.top_toolbar_search) ?: return
+        binding.mainMenu.findViewById<View>(org.fossify.commons.R.id.top_toolbar_search_icon)?.beVisibleIf(isSearching)
+        binding.mainMenu.findViewById<View>(org.fossify.commons.R.id.toolbar_container)?.background?.alpha = if (isSearching) 255 else 0
+
+        searchField.hint = getString(if (isSearching) R.string.search_contacts else org.fossify.commons.R.string.contacts_tab)
+        searchField.setHintTextColor(if (isSearching) textColor.adjustAlpha(0.6f) else textColor)
+        searchField.setTypeface(null, if (isSearching) Typeface.NORMAL else Typeface.BOLD)
+        val sizeRes = if (isSearching) org.fossify.commons.R.dimen.bigger_text_size else R.dimen.one_ui_title_size
+        searchField.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(sizeRes))
+
+        binding.mainMenu.requireToolbar().menu.apply {
+            findItem(R.id.create_contact_menu)?.isVisible = !isSearching
+            findItem(R.id.search_menu)?.isVisible = !isSearching
+        }
     }
 
     private fun storeStateVariables() {
@@ -299,14 +347,14 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
 
     private fun setupTabColors() {
         val activeView = binding.mainTabsHolder.getTabAt(binding.viewPager.currentItem)?.customView
-        updateBottomTabItemColors(activeView, true, getSelectedTabDrawableIds()[binding.viewPager.currentItem])
+        updateNavigationTabColors(activeView, true, getSelectedTabDrawableIds()[binding.viewPager.currentItem])
 
         getInactiveTabIndexes(binding.viewPager.currentItem).forEach { index ->
             val inactiveView = binding.mainTabsHolder.getTabAt(index)?.customView
-            updateBottomTabItemColors(inactiveView, false, getDeselectedTabDrawableIds()[index])
+            updateNavigationTabColors(inactiveView, false, getDeselectedTabDrawableIds()[index])
         }
 
-        val bottomBarColor = getBottomNavigationBackgroundColor()
+        val bottomBarColor = getToneColor(ToneRole.PAGE)
         binding.mainTabsHolder.setBackgroundColor(bottomBarColor)
     }
 
@@ -415,12 +463,12 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
 
         binding.mainTabsHolder.onTabSelectionChanged(
             tabUnselectedAction = {
-                updateBottomTabItemColors(it.customView, false, getDeselectedTabDrawableIds()[it.position])
+                updateNavigationTabColors(it.customView, false, getDeselectedTabDrawableIds()[it.position])
             },
             tabSelectedAction = {
                 getCurrentFragment()?.onSearchQueryChanged(binding.mainMenu.getCurrentQuery())
                 binding.viewPager.currentItem = it.position
-                updateBottomTabItemColors(it.customView, true, getSelectedTabDrawableIds()[it.position])
+                updateNavigationTabColors(it.customView, true, getSelectedTabDrawableIds()[it.position])
             }
         )
 

@@ -5,4 +5,25 @@
     <dimen name="contact_icons_size">40dp</dimen>
     <dimen name="dialpad_button_size">60dp</dimen>
     <dimen name="top_contact_image_height">300dp</dimen>
+
+    <!-- Google Contacts style -->
+    <dimen name="contact_header_photo_size">120dp</dimen>
+    <dimen name="contact_header_name_size">28sp</dimen>
+    <dimen name="contact_action_button_size">56dp</dimen>
+    <dimen name="card_corner_radius">24dp</dimen>
+    <dimen name="list_letter_column_width">40dp</dimen>
+    <dimen name="list_letter_text_size">16sp</dimen>
+    <dimen name="search_bar_height">56dp</dimen>
+    <dimen name="search_bar_corner_radius">28dp</dimen>
+    <dimen name="search_bar_icon_padding">20dp</dimen>
+    <dimen name="bottom_nav_pill_width">64dp</dimen>
+    <dimen name="bottom_nav_pill_height">32dp</dimen>
+    <dimen name="outlined_field_corner_radius">8dp</dimen>
+    <dimen name="edit_photo_badge_size">40dp</dimen>
+
+    <!-- Samsung One UI style -->
+    <dimen name="list_card_corner_radius">26dp</dimen>
+    <dimen name="favorite_tile_gap">5dp</dimen>
+    <dimen name="favorite_tile_corner_radius">22dp</dimen>
+    <dimen name="one_ui_title_size">26sp</dimen>
 </resources>

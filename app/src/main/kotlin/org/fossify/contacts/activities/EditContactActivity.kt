@@ -5,7 +5,9 @@ import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ContentValues
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.media.AudioManager
 import android.media.RingtoneManager
 import android.net.Uri
@@ -30,6 +32,9 @@ import org.fossify.commons.dialogs.ConfirmationAdvancedDialog
 import org.fossify.commons.dialogs.RadioGroupDialog
 import org.fossify.commons.dialogs.SelectAlarmSoundDialog
 import org.fossify.commons.extensions.applyColorFilter
+import org.fossify.commons.extensions.insetsController
+import org.fossify.commons.extensions.getProperBackgroundColor
+import org.fossify.commons.extensions.getContrastColor
 import org.fossify.commons.extensions.beGone
 import org.fossify.commons.extensions.beInvisible
 import org.fossify.commons.extensions.beVisible
@@ -125,6 +130,9 @@ import org.fossify.contacts.dialogs.SelectGroupsDialog
 import org.fossify.contacts.extensions.config
 import org.fossify.contacts.extensions.getCachePhotoUri
 import org.fossify.contacts.extensions.showContactSourcePicker
+import org.fossify.contacts.extensions.updateOutlinedFields
+import org.fossify.contacts.extensions.ToneRole
+import org.fossify.contacts.extensions.getToneColor
 import org.fossify.contacts.helpers.ADD_NEW_CONTACT_NUMBER
 import org.fossify.contacts.helpers.IS_FROM_SIMPLE_CONTACTS
 import org.fossify.contacts.helpers.KEY_EMAIL
@@ -364,6 +372,8 @@ class EditContactActivity : ContactActivity() {
         }
 
         updateTextColors(binding.contactScrollview)
+        updateOutlinedFields(binding.contactScrollview)
+
         numberViewToColor?.setTextColor(properPrimaryColor)
         emailViewToColor?.setTextColor(properPrimaryColor)
         wasActivityInitialized = true
@@ -563,6 +573,8 @@ class EditContactActivity : ContactActivity() {
         val isRingtoneVisible = showFields and SHOW_RINGTONE_FIELD != 0
         binding.contactRingtone.beVisibleIf(isRingtoneVisible)
         binding.contactRingtoneImage.beVisibleIf(isRingtoneVisible)
+        // the outlined boxes around the fields follow the fields' visibility
+        updateOutlinedFields(binding.contactScrollview)
     }
 
     private fun setupEditContact() {
@@ -1486,6 +1498,7 @@ class EditContactActivity : ContactActivity() {
     private fun addNewPhoneNumberField() {
         val numberHolder = ItemEditPhoneNumberBinding.inflate(layoutInflater, binding.contactNumbersHolder, false)
         updateTextColors(numberHolder.root)
+        updateOutlinedFields(numberHolder.root)
         setupPhoneNumberTypePicker(numberHolder.contactNumberType, DEFAULT_PHONE_NUMBER_TYPE, "")
         binding.contactNumbersHolder.addView(numberHolder.root)
         binding.contactNumbersHolder.onGlobalLayout {
@@ -1499,6 +1512,7 @@ class EditContactActivity : ContactActivity() {
     private fun addNewEmailField() {
         val emailHolder = ItemEditEmailBinding.inflate(layoutInflater, binding.contactEmailsHolder, false)
         updateTextColors(emailHolder.root)
+        updateOutlinedFields(emailHolder.root)
         setupEmailTypePicker(emailHolder.contactEmailType, DEFAULT_EMAIL_TYPE, "")
         binding.contactEmailsHolder.addView(emailHolder.root)
         binding.contactEmailsHolder.onGlobalLayout {
@@ -1512,6 +1526,7 @@ class EditContactActivity : ContactActivity() {
             val structutedAddressHolder = ItemEditStructuredAddressBinding.inflate(layoutInflater,
                 binding.contactAddressesHolder, false)
             updateTextColors(structutedAddressHolder.root)
+            updateOutlinedFields(structutedAddressHolder.root)
             setupAddressTypePicker(structutedAddressHolder.contactStructuredAddressType, DEFAULT_ADDRESS_TYPE, "")
             binding.contactAddressesHolder.addView(structutedAddressHolder.root)
             binding.contactAddressesHolder.onGlobalLayout {
@@ -1521,6 +1536,7 @@ class EditContactActivity : ContactActivity() {
         } else {
             val addressHolder = ItemEditAddressBinding.inflate(layoutInflater, binding.contactAddressesHolder, false)
             updateTextColors(addressHolder.root)
+            updateOutlinedFields(addressHolder.root)
             setupAddressTypePicker(addressHolder.contactAddressType, DEFAULT_ADDRESS_TYPE, "")
             binding.contactAddressesHolder.addView(addressHolder.root)
             binding.contactAddressesHolder.onGlobalLayout {
@@ -1533,6 +1549,7 @@ class EditContactActivity : ContactActivity() {
     private fun addNewIMField() {
         val IMHolder = ItemEditImBinding.inflate(layoutInflater, binding.contactImsHolder, false)
         updateTextColors(IMHolder.root)
+        updateOutlinedFields(IMHolder.root)
         setupIMTypePicker(IMHolder.contactImType, DEFAULT_IM_TYPE, "")
         binding.contactImsHolder.addView(IMHolder.root)
         binding.contactImsHolder.onGlobalLayout {
@@ -1541,9 +1558,29 @@ class EditContactActivity : ContactActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        applyTopBarStyle()
+    }
+
+    /** Google Contacts style: plain toolbar with text-colored icons, tonal camera badge on the round photo. */
+    private fun applyTopBarStyle() {
+        val backgroundColor = getProperBackgroundColor()
+        val iconColor = getProperTextColor()
+        binding.contactAppbar.setBackgroundColor(backgroundColor)
+        window.insetsController().isAppearanceLightStatusBars = backgroundColor.getContrastColor() != Color.WHITE
+        binding.contactToolbar.navigationIcon?.setTint(iconColor)
+        binding.contactToolbar.overflowIcon?.setTint(iconColor)
+        updateMenuItemColors(binding.contactToolbar.menu, baseColor = backgroundColor)
+        binding.contactToggleFavorite.applyColorFilter(iconColor)
+        binding.contactChangePhoto.backgroundTintList = ColorStateList.valueOf(getToneColor(ToneRole.SECONDARY_CONTAINER))
+        binding.contactChangePhoto.applyColorFilter(getToneColor(ToneRole.ON_SECONDARY_CONTAINER))
+    }
+
     private fun addNewEventField() {
         val eventHolder = ItemEventBinding.inflate(layoutInflater, binding.contactEventsHolder, false)
         updateTextColors(eventHolder.root)
+        updateOutlinedFields(eventHolder.root)
         setupEventTypePicker(eventHolder)
         binding.contactEventsHolder.addView(eventHolder.root)
     }
@@ -1561,6 +1598,7 @@ class EditContactActivity : ContactActivity() {
     private fun addNewWebsiteField() {
         val websitesHolder = ItemEditWebsiteBinding.inflate(layoutInflater, binding.contactWebsitesHolder, false)
         updateTextColors(websitesHolder.root)
+        updateOutlinedFields(websitesHolder.root)
         binding.contactWebsitesHolder.addView(websitesHolder.root)
         binding.contactWebsitesHolder.onGlobalLayout {
             websitesHolder.contactWebsite.requestFocus()

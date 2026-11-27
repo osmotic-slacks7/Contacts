@@ -14,6 +14,8 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.MotionEvent
 import android.view.View
+import android.graphics.Color
+import android.graphics.drawable.InsetDrawable
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -40,7 +42,13 @@ import org.fossify.contacts.R
 import org.fossify.contacts.activities.SimpleActivity
 import org.fossify.contacts.activities.ViewContactActivity
 import org.fossify.contacts.dialogs.CreateNewGroupDialog
+import org.fossify.contacts.extensions.ToneRole
 import org.fossify.contacts.extensions.config
+import org.fossify.contacts.extensions.createCardSegmentBackground
+import org.fossify.contacts.extensions.createInitialsAvatar
+import org.fossify.contacts.extensions.createOutlinedInitialAvatar
+import org.fossify.contacts.extensions.createTileBackground
+import org.fossify.contacts.extensions.getToneColor
 import org.fossify.contacts.extensions.editContact
 import org.fossify.contacts.extensions.shareContacts
 import org.fossify.contacts.helpers.*
@@ -79,6 +87,16 @@ class ContactsAdapter(
 
     init {
         setupDragListener(true)
+
+        // Samsung One UI style cards, letter headers and dividers on the main contacts list
+        for (i in recyclerView.itemDecorationCount - 1 downTo 0) {
+            if (recyclerView.getItemDecorationAt(i) is SectionCardDecoration) {
+                recyclerView.removeItemDecorationAt(i)
+            }
+        }
+        if (location == LOCATION_CONTACTS_TAB) {
+            recyclerView.addItemDecoration(SectionCardDecoration(this, activity.getProperTextColor()))
+        }
 
         if (enableDrag) {
             touchHelper = ItemTouchHelper(ItemMoveCallback(this, viewType == VIEW_TYPE_GRID))
@@ -171,7 +189,7 @@ class ContactsAdapter(
         val contact = contactItems[position]
         val allowLongClick = location != LOCATION_INSERT_OR_EDIT
         holder.bindView(contact, true, allowLongClick) { itemView, layoutPosition ->
-            setupView(itemView, contact, holder)
+            setupView(itemView, contact, holder, position)
         }
         bindViewHolder(holder)
     }
@@ -383,7 +401,7 @@ class ContactsAdapter(
         }
     }
 
-    private fun setupView(view: View, contact: Contact, holder: ViewHolder) {
+    private fun setupView(view: View, contact: Contact, holder: ViewHolder, position: Int) {
         view.apply {
             setupViewBackground(activity)
             findViewById<ConstraintLayout>(org.fossify.commons.R.id.item_contact_frame)?.isSelected = selectedKeys.contains(contact.id)
@@ -422,6 +440,9 @@ class ContactsAdapter(
                 }
             }
 
+            setupSectionCard(this, position)
+            setupFavoriteTile(this, contact)
+
             findViewById<ImageView>(org.fossify.commons.R.id.item_contact_image).apply {
                 beVisibleIf(showContactThumbnails)
                 if (profileIconClick != null && viewType != VIEW_TYPE_GRID) {
@@ -441,8 +462,11 @@ class ContactsAdapter(
             }
 
             if (showContactThumbnails) {
-                val placeholderImage =
-                    SimpleContactsHelper(context).getContactLetterIcon(fullName).toDrawable(resources)
+                val placeholderImage = if (viewType == VIEW_TYPE_GRID) {
+                    createOutlinedInitialAvatar(fullName).toDrawable(resources)
+                } else {
+                    createInitialsAvatar(fullName).toDrawable(resources)
+                }
                 if (contact.photoUri.isEmpty() && contact.photo == null) {
                     findViewById<ImageView>(org.fossify.commons.R.id.item_contact_image).setImageDrawable(placeholderImage)
                 } else {
@@ -481,6 +505,55 @@ class ContactsAdapter(
                 }
             }
         }
+    }
+
+    /** Samsung One UI style rows are grouped into rounded cards, one card per letter. */
+    fun useSectionCards() = location == LOCATION_CONTACTS_TAB && viewType == VIEW_TYPE_LIST
+
+    private fun showSectionLetters() = textToHighlight.isEmpty() && !config.isCustomOrderSelected
+
+    /** The letter a row belongs to, or "" when the whole list is a single card (while searching, or custom order). */
+    fun getSectionTitle(position: Int) = if (showSectionLetters()) onChange(position) else ""
+
+    fun isFirstInSection(position: Int) = position == 0 || getSectionTitle(position - 1) != getSectionTitle(position)
+
+    fun isLastInSection(position: Int) = position == contactItems.lastIndex || getSectionTitle(position + 1) != getSectionTitle(position)
+
+    private fun setupSectionCard(view: View, position: Int) {
+        // the left letter column from the Google style is replaced by headers drawn above each card
+        view.findViewById<TextView>(R.id.item_contact_letter)?.beGone()
+        if (!useSectionCards()) {
+            return
+        }
+
+        val radius = activity.resources.getDimension(R.dimen.list_card_corner_radius)
+        val clickSelector = view.background
+        view.background = createCardSegmentBackground(
+            color = activity.getToneColor(ToneRole.CARD),
+            radiusPx = radius,
+            isFirst = isFirstInSection(position),
+            isLast = isLastInSection(position)
+        )
+        view.foreground = clickSelector
+        view.clipToOutline = true
+    }
+
+    /** Samsung One UI style favourites: rounded gradient tiles with white text. */
+    private fun setupFavoriteTile(view: View, contact: Contact) {
+        if (viewType != VIEW_TYPE_GRID) {
+            return
+        }
+
+        val name = contact.getNameToDisplay()
+        val inset = activity.resources.getDimensionPixelSize(R.dimen.favorite_tile_gap)
+        val clickSelector = view.background
+        view.background = InsetDrawable(
+            createTileBackground(name, activity.resources.getDimension(R.dimen.favorite_tile_corner_radius)),
+            inset
+        )
+        view.foreground = clickSelector
+        view.findViewById<TextView>(org.fossify.commons.R.id.item_contact_name)?.setTextColor(Color.WHITE)
+        view.findViewById<TextView>(org.fossify.commons.R.id.item_contact_number)?.setTextColor(Color.WHITE)
     }
 
     override fun onChange(position: Int) = contactItems.getOrNull(position)?.getBubbleText() ?: ""
