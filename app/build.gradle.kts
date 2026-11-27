@@ -69,8 +69,11 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
+            // Lets a debug build install next to the regular Fossify Contacts app, which already owns this authority
+            manifestPlaceholders["contactsProviderAuthority"] = "org.fossify.commons.contactsprovider.debug"
         }
         release {
+            manifestPlaceholders["contactsProviderAuthority"] = "org.fossify.commons.contactsprovider"
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
