@@ -7,4 +7,13 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <!-- Google Contacts style outlined text field for the edit screen. Colors are set at runtime (updateOutlinedFields). -->
+    <style name="GoogleOutlinedField" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/outlined_field_corner_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/outlined_field_corner_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/outlined_field_corner_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/outlined_field_corner_radius</item>
+        <item name="hintEnabled">true</item>
+    </style>
+
 </resources>

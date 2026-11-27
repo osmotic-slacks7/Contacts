@@ -265,14 +265,13 @@ class ViewContactActivity : ContactActivity() {
 
     /** Tonal circle buttons under the name and a tonal card for the contact details. */
     private fun applyHeaderStyle() {
-        val primaryColor = getProperPrimaryColor()
-        val textColor = getProperTextColor()
-        val tonalTint = ColorStateList.valueOf(primaryColor.adjustAlpha(0.16f))
+        val buttonTint = ColorStateList.valueOf(getToneColor(ToneRole.SECONDARY_CONTAINER))
+        val buttonIconColor = getToneColor(ToneRole.ON_SECONDARY_CONTAINER)
         arrayOf(binding.contactStartCallIcon, binding.contactSendSmsIcon, binding.contactSendEmailIcon).forEach {
-            it.backgroundTintList = tonalTint
-            it.applyColorFilter(textColor)
+            it.backgroundTintList = buttonTint
+            it.applyColorFilter(buttonIconColor)
         }
-        binding.contactDetailsCard.backgroundTintList = ColorStateList.valueOf(primaryColor.adjustAlpha(0.07f))
+        binding.contactDetailsCard.backgroundTintList = ColorStateList.valueOf(getToneColor(ToneRole.SURFACE_CONTAINER))
     }
 
     private fun setupViewContact() {

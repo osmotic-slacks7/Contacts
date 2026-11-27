@@ -10,6 +10,7 @@
         android:id="@+id/contact_scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/contact_appbar"
         android:clipToPadding="false"
         android:scrollbars="none"
         android:visibility="gone"
@@ -20,47 +21,48 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
+            <!-- Google Contacts style header: round photo centered at the top, with a small camera badge -->
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/contact_photo"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/top_contact_image_height"
-                android:layout_marginBottom="@dimen/normal_margin"
+                android:layout_width="@dimen/contact_header_photo_size"
+                android:layout_height="@dimen/contact_header_photo_size"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/medium_margin"
+                android:layout_marginBottom="@dimen/activity_margin"
                 android:contentDescription="@string/change_photo"
                 android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/roundedImageView"
                 tools:src="@drawable/ic_person_vector" />
 
+            <!-- kept for compatibility with the shared photo code, never shown -->
             <ImageView
                 android:id="@+id/contact_photo_bottom_shadow"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/top_shadow_height"
-                android:layout_alignBottom="@+id/contact_photo"
-                android:background="@drawable/gradient_background"
-                android:contentDescription="@null" />
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:contentDescription="@null"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/contact_toggle_favorite"
                 android:layout_width="@dimen/contact_actions_size"
                 android:layout_height="@dimen/contact_actions_size"
-                android:layout_alignStart="@+id/contact_photo"
-                android:layout_alignBottom="@id/contact_photo"
-                android:layout_marginStart="@dimen/medium_margin"
-                android:layout_marginBottom="@dimen/medium_margin"
+                android:layout_alignTop="@+id/contact_photo"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/medium_margin"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/toggle_favorite"
-                android:padding="@dimen/tiny_margin"
+                android:padding="@dimen/normal_margin"
                 android:src="@drawable/ic_star_outline_vector" />
 
             <ImageView
                 android:id="@+id/contact_change_photo"
-                android:layout_width="@dimen/contact_actions_size"
-                android:layout_height="@dimen/contact_actions_size"
+                android:layout_width="@dimen/edit_photo_badge_size"
+                android:layout_height="@dimen/edit_photo_badge_size"
                 android:layout_alignEnd="@+id/contact_photo"
                 android:layout_alignBottom="@+id/contact_photo"
-                android:layout_marginEnd="@dimen/medium_margin"
-                android:layout_marginBottom="@dimen/medium_margin"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/tonal_circle_background"
                 android:contentDescription="@string/change_photo"
-                android:padding="@dimen/small_margin"
+                android:padding="@dimen/medium_margin"
                 android:src="@drawable/ic_camera_vector" />
 
             <ImageView
@@ -75,8 +77,8 @@
                 android:paddingBottom="@dimen/small_margin"
                 android:src="@drawable/ic_person_vector" />
 
-            <org.fossify.commons.views.MyEditText
-                android:id="@+id/contact_prefix"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_prefix_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/contact_photo"
@@ -84,101 +86,155 @@
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_marginBottom="@dimen/normal_margin"
                 android:layout_toEndOf="@+id/contact_name_image"
-                android:hint="@string/prefix"
-                android:inputType="textCapWords"
-                android:lines="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
 
-            <org.fossify.commons.views.MyAutoCompleteTextView
-                android:id="@+id/contact_first_name"
+                <org.fossify.commons.views.MyEditText
+                    android:id="@+id/contact_prefix"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prefix"
+                    android:inputType="textCapWords"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_first_name_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_prefix"
+                android:layout_below="@+id/contact_prefix_layout"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_marginBottom="@dimen/normal_margin"
                 android:layout_toEndOf="@+id/contact_name_image"
-                android:completionThreshold="2"
-                android:hint="@string/first_name"
-                android:inputType="textCapWords"
-                android:lines="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
 
-            <org.fossify.commons.views.MyAutoCompleteTextView
-                android:id="@+id/contact_middle_name"
+                <org.fossify.commons.views.MyAutoCompleteTextView
+                    android:id="@+id/contact_first_name"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:completionThreshold="2"
+                    android:hint="@string/first_name"
+                    android:inputType="textCapWords"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_middle_name_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_first_name"
+                android:layout_below="@+id/contact_first_name_layout"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_marginBottom="@dimen/normal_margin"
                 android:layout_toEndOf="@+id/contact_name_image"
-                android:completionThreshold="2"
-                android:hint="@string/middle_name"
-                android:inputType="textCapWords"
-                android:lines="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
 
-            <org.fossify.commons.views.MyAutoCompleteTextView
-                android:id="@+id/contact_surname"
+                <org.fossify.commons.views.MyAutoCompleteTextView
+                    android:id="@+id/contact_middle_name"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:completionThreshold="2"
+                    android:hint="@string/middle_name"
+                    android:inputType="textCapWords"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_surname_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_middle_name"
+                android:layout_below="@+id/contact_middle_name_layout"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_marginBottom="@dimen/normal_margin"
                 android:layout_toEndOf="@+id/contact_name_image"
-                android:completionThreshold="2"
-                android:hint="@string/surname"
-                android:inputType="textCapWords"
-                android:lines="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
 
-            <org.fossify.commons.views.MyEditText
-                android:id="@+id/contact_suffix"
+                <org.fossify.commons.views.MyAutoCompleteTextView
+                    android:id="@+id/contact_surname"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:completionThreshold="2"
+                    android:hint="@string/surname"
+                    android:inputType="textCapWords"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_suffix_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_surname"
+                android:layout_below="@+id/contact_surname_layout"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_marginBottom="@dimen/medium_margin"
                 android:layout_toEndOf="@+id/contact_name_image"
-                android:hint="@string/suffix"
-                android:inputType="textCapWords"
-                android:lines="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
 
-            <org.fossify.commons.views.MyEditText
-                android:id="@+id/contact_nickname"
+                <org.fossify.commons.views.MyEditText
+                    android:id="@+id/contact_suffix"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/suffix"
+                    android:inputType="textCapWords"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_nickname_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_suffix"
+                android:layout_below="@+id/contact_suffix_layout"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_marginBottom="@dimen/medium_margin"
                 android:layout_toEndOf="@+id/contact_name_image"
-                android:hint="@string/nickname"
-                android:inputType="textCapWords"
-                android:lines="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
+
+                <org.fossify.commons.views.MyEditText
+                    android:id="@+id/contact_nickname"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/nickname"
+                    android:inputType="textCapWords"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:id="@+id/contact_numbers_image"
@@ -196,7 +252,7 @@
                 android:id="@+id/contact_numbers_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_nickname"
+                android:layout_below="@+id/contact_nickname_layout"
                 android:layout_marginBottom="@dimen/small_margin"
                 android:layout_toEndOf="@+id/contact_numbers_image"
                 android:orientation="vertical">
@@ -376,7 +432,7 @@
                 android:id="@+id/contact_notes_image"
                 android:layout_width="@dimen/contact_icons_size"
                 android:layout_height="@dimen/contact_icons_size"
-                android:layout_alignTop="@+id/contact_notes"
+                android:layout_alignTop="@+id/contact_notes_layout"
                 android:layout_marginStart="@dimen/normal_margin"
                 android:contentDescription="@null"
                 android:paddingTop="@dimen/medium_margin"
@@ -384,8 +440,8 @@
                 android:paddingBottom="@dimen/small_margin"
                 android:src="@drawable/ic_label_vector" />
 
-            <org.fossify.commons.views.MyEditText
-                android:id="@+id/contact_notes"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_notes_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/contact_events_add_new"
@@ -393,10 +449,19 @@
                 android:layout_marginTop="@dimen/normal_margin"
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_toEndOf="@+id/contact_notes_image"
-                android:hint="@string/notes"
-                android:inputType="textCapSentences|textMultiLine"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
+
+                <org.fossify.commons.views.MyEditText
+                    android:id="@+id/contact_notes"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/notes"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:id="@+id/contact_ringtone_image"
@@ -414,7 +479,7 @@
                 android:id="@+id/contact_ringtone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_notes"
+                android:layout_below="@+id/contact_notes_layout"
                 android:layout_centerVertical="true"
                 android:layout_marginTop="@dimen/normal_margin"
                 android:layout_marginEnd="@dimen/activity_margin"
@@ -428,7 +493,7 @@
                 android:id="@+id/contact_organization_image"
                 android:layout_width="@dimen/contact_icons_size"
                 android:layout_height="@dimen/contact_icons_size"
-                android:layout_alignTop="@+id/contact_organization_company"
+                android:layout_alignTop="@+id/contact_organization_company_layout"
                 android:layout_marginStart="@dimen/normal_margin"
                 android:contentDescription="@null"
                 android:paddingTop="@dimen/medium_margin"
@@ -436,8 +501,8 @@
                 android:paddingBottom="@dimen/small_margin"
                 android:src="@drawable/ic_business_vector" />
 
-            <org.fossify.commons.views.MyEditText
-                android:id="@+id/contact_organization_company"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_organization_company_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/contact_ringtone"
@@ -445,28 +510,46 @@
                 android:layout_marginTop="@dimen/normal_margin"
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_toEndOf="@+id/contact_organization_image"
-                android:hint="@string/company"
-                android:inputType="textCapWords"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
 
-            <org.fossify.commons.views.MyEditText
-                android:id="@+id/contact_organization_job_position"
+                <org.fossify.commons.views.MyEditText
+                    android:id="@+id/contact_organization_company"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/company"
+                    android:inputType="textCapWords"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/contact_organization_job_position_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_organization_company"
+                android:layout_below="@+id/contact_organization_company_layout"
                 android:layout_centerVertical="true"
                 android:layout_marginTop="@dimen/normal_margin"
                 android:layout_marginEnd="@dimen/activity_margin"
                 android:layout_toEndOf="@+id/contact_organization_image"
-                android:hint="@string/job_position"
-                android:inputType="textCapWords"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textCursorDrawable="@null"
-                android:textSize="@dimen/bigger_text_size" />
+                style="@style/GoogleOutlinedField">
+
+                <org.fossify.commons.views.MyEditText
+                    android:id="@+id/contact_organization_job_position"
+                    android:background="@null"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/job_position"
+                    android:inputType="textCapWords"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textCursorDrawable="@null"
+                    android:textSize="@dimen/bigger_text_size" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <ImageView
                 android:id="@+id/contact_websites_image"
@@ -484,7 +567,7 @@
                 android:id="@+id/contact_websites_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/contact_organization_job_position"
+                android:layout_below="@+id/contact_organization_job_position_layout"
                 android:layout_marginTop="@dimen/medium_margin"
                 android:layout_toEndOf="@+id/contact_name_image"
                 android:orientation="vertical">
@@ -579,14 +662,6 @@
 
         </RelativeLayout>
     </ScrollView>
-
-    <ImageView
-        android:id="@+id/contact_photo_top_shadow"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/top_shadow_height"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/gradient_background_flipped"
-        android:contentDescription="@null" />
 
     <org.fossify.commons.views.MyAppBarLayout
         android:id="@+id/contact_appbar"

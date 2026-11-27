@@ -172,10 +172,10 @@ fun Context.copyUriToTempFile(uri: Uri, name: String): File? {
 fun Context.updateNavigationTabColors(view: View?, isActive: Boolean, drawableId: Int? = null) {
     updateBottomTabItemColors(view, isActive, drawableId)
     val textColor = getProperTextColor()
-    val pillColor = if (isActive) getProperPrimaryColor().adjustAlpha(0.22f) else Color.TRANSPARENT
+    val pillColor = if (isActive) getToneColor(ToneRole.SECONDARY_CONTAINER) else Color.TRANSPARENT
     view?.findViewById<ImageView>(org.fossify.commons.R.id.tab_item_icon)?.apply {
         backgroundTintList = ColorStateList.valueOf(pillColor)
-        applyColorFilter(textColor)
+        applyColorFilter(if (isActive) getToneColor(ToneRole.ON_SECONDARY_CONTAINER) else textColor)
     }
     view?.findViewById<TextView>(org.fossify.commons.R.id.tab_item_label)?.apply {
         setTextColor(textColor)

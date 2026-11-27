@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Icon
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
+import android.view.View
 import androidx.viewpager.widget.ViewPager
 import me.grantland.widget.AutofitHelper
 import org.fossify.commons.databases.ContactsDatabase
@@ -30,6 +31,8 @@ import org.fossify.contacts.extensions.config
 import org.fossify.contacts.extensions.handleGenericContactClick
 import org.fossify.contacts.extensions.tryImportContactsFromFile
 import org.fossify.contacts.extensions.updateNavigationTabColors
+import org.fossify.contacts.extensions.ToneRole
+import org.fossify.contacts.extensions.getToneColor
 import org.fossify.contacts.fragments.FavoritesFragment
 import org.fossify.contacts.fragments.MyViewPagerFragment
 import org.fossify.contacts.helpers.ALL_TABS_MASK
@@ -238,6 +241,9 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
 
     private fun updateMenuColors() {
         binding.mainMenu.updateColors()
+        // Google Contacts style: the search pill uses a neutral tonal surface instead of tinted primary
+        binding.mainMenu.findViewById<View>(org.fossify.commons.R.id.toolbar_container)
+            ?.background?.applyColorFilter(getToneColor(ToneRole.SURFACE_CONTAINER_HIGH))
     }
 
     private fun storeStateVariables() {
@@ -308,7 +314,7 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
             updateNavigationTabColors(inactiveView, false, getDeselectedTabDrawableIds()[index])
         }
 
-        val bottomBarColor = getBottomNavigationBackgroundColor()
+        val bottomBarColor = getToneColor(ToneRole.SURFACE_CONTAINER)
         binding.mainTabsHolder.setBackgroundColor(bottomBarColor)
     }
 

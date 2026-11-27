@@ -28,7 +28,9 @@ import org.fossify.contacts.adapters.ContactsAdapter
 import org.fossify.contacts.adapters.GroupsAdapter
 import org.fossify.contacts.databinding.FragmentLayoutBinding
 import org.fossify.contacts.databinding.FragmentLettersLayoutBinding
+import org.fossify.contacts.extensions.ToneRole
 import org.fossify.contacts.extensions.config
+import org.fossify.contacts.extensions.getToneColor
 import org.fossify.contacts.helpers.AVOID_CHANGING_TEXT_TAG
 import org.fossify.contacts.helpers.AVOID_CHANGING_VISIBILITY_TAG
 import org.fossify.contacts.helpers.Config
@@ -119,8 +121,8 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
         innerBinding.fragmentPlaceholder2.setTextColor(adjustedPrimaryColor)
 
         innerBinding.fragmentFab.apply {
-            val contentColor = adjustedPrimaryColor.getContrastColor()
-            backgroundTintList = adjustedPrimaryColor.getColorStateList()
+            val contentColor = context.getToneColor(ToneRole.ON_PRIMARY_CONTAINER)
+            backgroundTintList = context.getToneColor(ToneRole.PRIMARY_CONTAINER).getColorStateList()
             iconTint = contentColor.getColorStateList()
             setTextColor(contentColor)
         }
