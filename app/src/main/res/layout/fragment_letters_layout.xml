@@ -64,12 +64,14 @@
 
     </RelativeLayout>
 
-    <org.fossify.commons.views.MyFloatingActionButton
+    <!-- Google Contacts style extended button ("+ Create contact"). Text and colors are set in MyViewPagerFragment. -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fragment_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/activity_margin"
-        android:src="@drawable/ic_plus_vector" />
+        android:text="@string/create_contact"
+        app:icon="@drawable/ic_plus_vector" />
 
 </merge>

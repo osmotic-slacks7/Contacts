@@ -3,6 +3,8 @@ package org.fossify.contacts.activities
 import android.content.ActivityNotFoundException
 import android.content.ContentUris
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.media.AudioManager
 import android.media.RingtoneManager
 import android.net.Uri
@@ -62,6 +64,7 @@ class ViewContactActivity : ContactActivity() {
 
     override fun onResume() {
         super.onResume()
+        applyTopBarStyle()
         isViewIntent = intent.action == ContactsContract.QuickContact.ACTION_QUICK_CONTACT || intent.action == Intent.ACTION_VIEW
         if (isViewIntent) {
             handlePermission(PERMISSION_READ_CONTACTS) {
@@ -241,7 +244,35 @@ class ViewContactActivity : ContactActivity() {
         binding.contactSendEmail.setOnLongClickListener { toast(org.fossify.commons.R.string.send_email); true; }
 
         updateTextColors(binding.contactScrollview)
+        applyHeaderStyle()
         binding.contactToolbar.menu.findItem(R.id.open_with).isVisible = contact?.isPrivate() == false
+    }
+
+    /**
+     * The toolbar no longer sits on top of a full-width photo, so use normal
+     * text-colored icons and a status bar that matches the background.
+     */
+    private fun applyTopBarStyle() {
+        val backgroundColor = getProperBackgroundColor()
+        val iconColor = getProperTextColor()
+        binding.contactAppbar.setBackgroundColor(backgroundColor)
+        window.insetsController().isAppearanceLightStatusBars = backgroundColor.getContrastColor() != Color.WHITE
+        binding.contactToolbar.navigationIcon?.setTint(iconColor)
+        binding.contactToolbar.overflowIcon?.setTint(iconColor)
+        updateMenuItemColors(binding.contactToolbar.menu, baseColor = backgroundColor)
+        binding.contactToggleFavorite.applyColorFilter(iconColor)
+    }
+
+    /** Tonal circle buttons under the name and a tonal card for the contact details. */
+    private fun applyHeaderStyle() {
+        val primaryColor = getProperPrimaryColor()
+        val textColor = getProperTextColor()
+        val tonalTint = ColorStateList.valueOf(primaryColor.adjustAlpha(0.16f))
+        arrayOf(binding.contactStartCallIcon, binding.contactSendSmsIcon, binding.contactSendEmailIcon).forEach {
+            it.backgroundTintList = tonalTint
+            it.applyColorFilter(textColor)
+        }
+        binding.contactDetailsCard.backgroundTintList = ColorStateList.valueOf(primaryColor.adjustAlpha(0.07f))
     }
 
     private fun setupViewContact() {

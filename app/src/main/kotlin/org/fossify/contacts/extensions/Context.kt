@@ -5,7 +5,12 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import android.net.Uri
 import androidx.core.app.AlarmManagerCompat
 import androidx.core.content.FileProvider
@@ -158,4 +163,22 @@ fun Context.copyUriToTempFile(uri: Uri, name: String): File? {
     }
 
     return tempFile
+}
+
+/**
+ * Material 3 navigation bar look (Google Contacts style): the selected tab gets a tonal pill behind
+ * its icon, icons and labels use the normal text color. Wraps the Commons helper, which swaps the icons.
+ */
+fun Context.updateNavigationTabColors(view: View?, isActive: Boolean, drawableId: Int? = null) {
+    updateBottomTabItemColors(view, isActive, drawableId)
+    val textColor = getProperTextColor()
+    val pillColor = if (isActive) getProperPrimaryColor().adjustAlpha(0.22f) else Color.TRANSPARENT
+    view?.findViewById<ImageView>(org.fossify.commons.R.id.tab_item_icon)?.apply {
+        backgroundTintList = ColorStateList.valueOf(pillColor)
+        applyColorFilter(textColor)
+    }
+    view?.findViewById<TextView>(org.fossify.commons.R.id.tab_item_label)?.apply {
+        setTextColor(textColor)
+        setTypeface(null, if (isActive) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+    }
 }

@@ -29,6 +29,7 @@ import org.fossify.contacts.dialogs.FilterContactSourcesDialog
 import org.fossify.contacts.extensions.config
 import org.fossify.contacts.extensions.handleGenericContactClick
 import org.fossify.contacts.extensions.tryImportContactsFromFile
+import org.fossify.contacts.extensions.updateNavigationTabColors
 import org.fossify.contacts.fragments.FavoritesFragment
 import org.fossify.contacts.fragments.MyViewPagerFragment
 import org.fossify.contacts.helpers.ALL_TABS_MASK
@@ -57,6 +58,7 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
         appLaunched(BuildConfig.APPLICATION_ID)
         setupOptionsMenu()
         refreshMenuItems()
+        binding.mainMenu.updateHintText(getString(R.string.search_contacts))
         setupEdgeToEdge(
             padBottomImeAndSystem = listOf(binding.mainTabsHolder),
         )
@@ -299,11 +301,11 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
 
     private fun setupTabColors() {
         val activeView = binding.mainTabsHolder.getTabAt(binding.viewPager.currentItem)?.customView
-        updateBottomTabItemColors(activeView, true, getSelectedTabDrawableIds()[binding.viewPager.currentItem])
+        updateNavigationTabColors(activeView, true, getSelectedTabDrawableIds()[binding.viewPager.currentItem])
 
         getInactiveTabIndexes(binding.viewPager.currentItem).forEach { index ->
             val inactiveView = binding.mainTabsHolder.getTabAt(index)?.customView
-            updateBottomTabItemColors(inactiveView, false, getDeselectedTabDrawableIds()[index])
+            updateNavigationTabColors(inactiveView, false, getDeselectedTabDrawableIds()[index])
         }
 
         val bottomBarColor = getBottomNavigationBackgroundColor()
@@ -415,12 +417,12 @@ class MainActivity : SimpleActivity(), RefreshContactsListener {
 
         binding.mainTabsHolder.onTabSelectionChanged(
             tabUnselectedAction = {
-                updateBottomTabItemColors(it.customView, false, getDeselectedTabDrawableIds()[it.position])
+                updateNavigationTabColors(it.customView, false, getDeselectedTabDrawableIds()[it.position])
             },
             tabSelectedAction = {
                 getCurrentFragment()?.onSearchQueryChanged(binding.mainMenu.getCurrentQuery())
                 binding.viewPager.currentItem = it.position
-                updateBottomTabItemColors(it.customView, true, getSelectedTabDrawableIds()[it.position])
+                updateNavigationTabColors(it.customView, true, getSelectedTabDrawableIds()[it.position])
             }
         )
 

@@ -171,7 +171,7 @@ class ContactsAdapter(
         val contact = contactItems[position]
         val allowLongClick = location != LOCATION_INSERT_OR_EDIT
         holder.bindView(contact, true, allowLongClick) { itemView, layoutPosition ->
-            setupView(itemView, contact, holder)
+            setupView(itemView, contact, holder, position)
         }
         bindViewHolder(holder)
     }
@@ -383,7 +383,7 @@ class ContactsAdapter(
         }
     }
 
-    private fun setupView(view: View, contact: Contact, holder: ViewHolder) {
+    private fun setupView(view: View, contact: Contact, holder: ViewHolder, position: Int) {
         view.apply {
             setupViewBackground(activity)
             findViewById<ConstraintLayout>(org.fossify.commons.R.id.item_contact_frame)?.isSelected = selectedKeys.contains(contact.id)
@@ -421,6 +421,8 @@ class ContactsAdapter(
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize)
                 }
             }
+
+            setupSectionLetter(this, position)
 
             findViewById<ImageView>(org.fossify.commons.R.id.item_contact_image).apply {
                 beVisibleIf(showContactThumbnails)
@@ -481,6 +483,26 @@ class ContactsAdapter(
                 }
             }
         }
+    }
+
+    /**
+     * Google Contacts style: show the section letter (A, B, C...) in a column to the left of the
+     * first contact that starts with it. Only on the main contacts list, sorted by name, not while searching.
+     */
+    private fun setupSectionLetter(view: View, position: Int) {
+        val letterView = view.findViewById<TextView>(R.id.item_contact_letter) ?: return
+        val showLetters = location == LOCATION_CONTACTS_TAB && viewType == VIEW_TYPE_LIST &&
+            textToHighlight.isEmpty() && !config.isCustomOrderSelected
+        if (!showLetters) {
+            letterView.beGone()
+            return
+        }
+
+        val letter = onChange(position)
+        val isFirstOfSection = position == 0 || onChange(position - 1) != letter
+        letterView.text = if (isFirstOfSection) letter else ""
+        letterView.setTextColor(properPrimaryColor)
+        letterView.beVisible()
     }
 
     override fun onChange(position: Int) = contactItems.getOrNull(position)?.getBubbleText() ?: ""
