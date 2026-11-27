@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.recyclerview.widget.RecyclerView
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.reddit.indicatorfastscroll.FastScrollItemIndicator
 import com.reddit.indicatorfastscroll.FastScrollerThumbView
@@ -70,7 +69,8 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
             when (this) {
                 is ContactsFragment -> {
                     innerBinding.fragmentFab.contentDescription = activity.getString(org.fossify.commons.R.string.create_new_contact)
-                    setupExtendedFab()
+                    // Samsung One UI style: creating a contact is the + in the top bar, there is no floating button
+                    innerBinding.fragmentFab.beGone()
                 }
 
                 is FavoritesFragment -> {
@@ -92,20 +92,6 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
                 innerBinding.fragmentFab.shrink()
             }
         }
-    }
-
-    /** Collapse the "Create contact" button to just the + icon while scrolling down, expand it again when scrolling up. */
-    private fun setupExtendedFab() {
-        innerBinding.fragmentList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val fab = innerBinding.fragmentFab
-                if (dy > 0 && fab.isExtended) {
-                    fab.shrink()
-                } else if (dy < 0 && !fab.isExtended) {
-                    fab.extend()
-                }
-            }
-        })
     }
 
     fun setupColors(textColor: Int, adjustedPrimaryColor: Int) {

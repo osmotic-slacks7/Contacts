@@ -253,8 +253,10 @@ class ViewContactActivity : ContactActivity() {
      * text-colored icons and a status bar that matches the background.
      */
     private fun applyTopBarStyle() {
-        val backgroundColor = getProperBackgroundColor()
+        // Samsung One UI style: light grey page behind a white details card
+        val backgroundColor = getToneColor(ToneRole.PAGE)
         val iconColor = getProperTextColor()
+        binding.contactWrapper.setBackgroundColor(backgroundColor)
         binding.contactAppbar.setBackgroundColor(backgroundColor)
         window.insetsController().isAppearanceLightStatusBars = backgroundColor.getContrastColor() != Color.WHITE
         binding.contactToolbar.navigationIcon?.setTint(iconColor)
@@ -271,7 +273,7 @@ class ViewContactActivity : ContactActivity() {
             it.backgroundTintList = buttonTint
             it.applyColorFilter(buttonIconColor)
         }
-        binding.contactDetailsCard.backgroundTintList = ColorStateList.valueOf(getToneColor(ToneRole.SURFACE_CONTAINER))
+        binding.contactDetailsCard.backgroundTintList = ColorStateList.valueOf(getToneColor(ToneRole.CARD))
     }
 
     private fun setupViewContact() {

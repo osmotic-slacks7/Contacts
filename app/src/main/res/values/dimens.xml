@@ -20,4 +20,10 @@
     <dimen name="bottom_nav_pill_height">32dp</dimen>
     <dimen name="outlined_field_corner_radius">8dp</dimen>
     <dimen name="edit_photo_badge_size">40dp</dimen>
+
+    <!-- Samsung One UI style -->
+    <dimen name="list_card_corner_radius">26dp</dimen>
+    <dimen name="favorite_tile_gap">5dp</dimen>
+    <dimen name="favorite_tile_corner_radius">22dp</dimen>
+    <dimen name="one_ui_title_size">26sp</dimen>
 </resources>
